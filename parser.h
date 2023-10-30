@@ -11,7 +11,7 @@ typedef struct
 {
 	uint8_t ok;
 	uint8_t data[AT_COMMAND_MAX_LINES][AT_COMMAND_MAX_LINE_SIZE + 1];
-	uint32_t line_count;
+	uint32_t lineCount;
 }AT_COMMAND_DATA; 
 
 typedef enum
@@ -25,6 +25,7 @@ typedef enum
 extern AT_COMMAND_DATA data;
 
 //function decl
-STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t current_character); 
+STATE_MACHINE_RETURN_VALUE parse(uint8_t c); 
+void printChar(uint8_t c);
 
 #endif

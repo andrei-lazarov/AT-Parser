@@ -1,28 +1,34 @@
 //parser.c
 
+#include <stdio.h>
+#include <stdint.h>
 #include "parser.h"
-
 
 AT_COMMAND_DATA data;
 
 //function definition
-STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
+STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 {
-	static uint8_t state=0;
-	static uint8_t col_cnt = 0;
+	static uint8_t state = 0;
+	static uint8_t colCount = 0;
 	
 	switch(state)
 	{
 		case 0:
-			if(crt_char == 13) { // CR
+			if(c == '\r') { // CR
+				data.lineCount = 0;
+				colCount = 0;
 				state = 1;
-				data.line_count = 0;
-				col_cnt = 0;
+			}
+			else {
+				return STATE_MACHINE_READY_WITH_ERROR;
 			}
 			break;
 			
 		case 1:
-			if(crt_char == 10) { // LF
+			if(c == '\n') { // LF
+				data.lineCount++;
+				colCount = 0;
 				state = 2;
 			}
 			else {
@@ -31,13 +37,13 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 			
 		case 2:
-			if(crt_char == 'O') {
+			if(c == 'O') {
 				state = 3;
 			}
-			else if(crt_char == 'E') {
+			else if(c == 'E') {
 				state = 7;
 			}
-			else if(crt_char == '+') {
+			else if(c == '+') {
 				state = 14;
 			}
 			else {
@@ -46,7 +52,7 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 		
 		case 3:
-			if(crt_char == 'K') {
+			if(c == 'K') {
 				state = 4;
 			}
 			else {
@@ -55,7 +61,7 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 			
 		case 4:
-			if(crt_char == '13') {
+			if(c == '\r') {
 				state = 5;
 			}
 			else {
@@ -64,7 +70,9 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 			
 		case 5:
-			if(crt_char == '10') {
+			if(c == '\n') {
+				data.lineCount++;
+				colCount = 0;
 				state = 6;
 				return STATE_MACHINE_READY_OK;
 			}
@@ -73,8 +81,11 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			}
 			break;
 			
+		case 6:
+			break;
+
 		case 7:
-			if(crt_char == 'R') {
+			if(c == 'R') {
 				state = 8;
 			}
 			else {
@@ -83,7 +94,7 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 		
 		case 8:
-			if(crt_char == 'R') {
+			if(c == 'R') {
 				state = 9;
 			}
 			else {
@@ -92,7 +103,7 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 			
 		case 9:
-			if(crt_char == 'O') {
+			if(c == 'O') {
 				state = 10;
 			}
 			else {
@@ -101,7 +112,7 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 			
 		case 10:
-			if(crt_char == 'R') {
+			if(c == 'R') {
 				state = 11;
 			}
 			else {
@@ -110,7 +121,7 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 			
 		case 11:
-			if(crt_char == 13) {
+			if(c == '\r') {
 				state = 12;
 			}
 			else {
@@ -119,7 +130,9 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 			
 		case 12:
-			if(crt_char == 10) {
+			if(c == '\n') {
+				data.lineCount++;
+				colCount = 0;
 				state = 13;
 				return STATE_MACHINE_READY_OK;
 			}
@@ -128,11 +141,14 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			}
 			break;
 		
+		case 13:
+			break;
+
 		case 14:
-			if ((32 <= crt_char) && (crt_char <= 126)) {
-				if(col_cnt < 256) {
-					data.data[data.line_count][col_cnt] = crt_char;
-					col_cnt++;
+			if ((32 <= c) && (c <= 126)) {
+				if(colCount < 256) {
+					data.data[data.lineCount][colCount] = c;
+					colCount++;
 				}
 				state = 15;
 			}
@@ -142,17 +158,17 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 			
 		case 15:
-			if ((32 <= crt_char) && (crt_char <= 126)) {
-				if(col_cnt < 256) {
-					data.data[data.line_count][col_cnt] = crt_char;
-					col_cnt++;
+			if ((32 <= c) && (c <= 126)) {
+				if(colCount < 256) {
+					data.data[data.lineCount][colCount] = c;
+					colCount++;
 				}
 				state = 15;
 			}
-			else if( crt_char == 13) {	// CR
-				data.data[data.line_count][col_cnt] = '/0';
-				data.line_count++;
-				col_cnt = 0;
+			else if( c == '\r') {	// CR
+				data.data[data.lineCount][colCount] = '\0';
+				data.lineCount++;
+				colCount = 0;
 				state = 16;
 			}
 			else {
@@ -161,7 +177,7 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 			
 		case 16:
-			if(crt_char == 10) { // LF
+			if(c == '\n') { // LF
 				state = 17;
 			}
 			else {
@@ -170,10 +186,10 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 			
 		case 17:
-			if(crt_char == '+') {
+			if(c == '+') {
 				state = 14;
 			}
-			else if( crt_char == 13) {
+			else if( c == '\r') {
 				state = 18;
 			}
 			else {
@@ -182,7 +198,7 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 			
 		case 18:
-			if(crt_char == 10) { // LF
+			if(c == '\n') { // LF
 				state = 19;
 			}
 			else {
@@ -191,10 +207,10 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			break;
 			
 		case 19:
-			if(crt_char == 'O') {
+			if(c == 'O') {
 				state = 3;
 			}
-			else if( crt_char == 'E') {
+			else if( c == 'E') {
 				state = 7;
 			}
 			else {
@@ -202,7 +218,21 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 			}
 			break;
 	}
+	colCount++;
 	return STATE_MACHINE_NOT_READY;
+}
+
+void printChar(uint8_t c)
+{
+	if (c=='\r') {
+		printf("<CR>");
+		return;
+	}
+	if (c=='\n') {
+		printf("<LF>\n");
+		return;
+	}
+	putchar(c);
 }
 
 
@@ -240,5 +270,3 @@ STATE_MACHINE_RETURN_VALUE at_command_parse(uint8_t crt_char)
 
 
 
-
-
