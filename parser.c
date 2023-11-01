@@ -72,7 +72,7 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 			if(c == '\n') {
 				data.lineCount++;
 				colCount = 0;
-				state = 6;
+				state = 0;
 				return STATE_MACHINE_READY_OK;
 			}
 			else {
@@ -132,7 +132,7 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 			if(c == '\n') {
 				data.lineCount++;
 				colCount = 0;
-				state = 13;
+				state = 0;
 				return STATE_MACHINE_READY_OK;
 			}
 			else {

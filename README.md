@@ -16,3 +16,11 @@ Digital Telecommunications Lab Project
 ### Run
 
     ./parser.exe test.txt
+
+### Compile and run
+
+    gcc -c main.c && gcc -c parser.c && gcc -o parser.exe main.o parser.o && ./parser.exe test.txt
+
+### State machine design
+
+![State machine image](state_machine.jpg)
