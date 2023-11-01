@@ -5,7 +5,7 @@
 #define __PARSER_AT__
 
 //custom types
-#define AT_COMMAND_MAX_LINES 100
+#define AT_COMMAND_MAX_LINES 1000
 #define AT_COMMAND_MAX_LINE_SIZE 128
 typedef struct
 {

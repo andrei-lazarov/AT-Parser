@@ -16,7 +16,6 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 	{
 		case 0:
 			if(c == '\r') { // CR
-				data.lineCount = 0;
 				colCount = 0;
 				state = 1;
 			}
@@ -146,9 +145,11 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 
 		case 14:
 			if ((32 <= c) && (c <= 126)) {
-				if(colCount < 256) {
-					data.data[data.lineCount][colCount] = c;
-					colCount++;
+				if(data.lineCount < AT_COMMAND_MAX_LINES) {
+					if(colCount < AT_COMMAND_MAX_LINE_SIZE - 1) {
+						data.data[data.lineCount][colCount] = c;
+						colCount++;
+					}
 				}
 				state = 15;
 			}
@@ -159,16 +160,20 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 			
 		case 15:
 			if ((32 <= c) && (c <= 126)) {
-				if(colCount < 256) {
-					data.data[data.lineCount][colCount] = c;
-					colCount++;
+				if(data.lineCount < AT_COMMAND_MAX_LINES){
+					if(colCount < AT_COMMAND_MAX_LINE_SIZE - 1) {
+						data.data[data.lineCount][colCount] = c;
+						colCount++;
+					}
 				}
 				state = 15;
 			}
 			else if( c == '\r') {	// CR
-				data.data[data.lineCount][colCount] = '\0';
-				data.lineCount++;
-				colCount = 0;
+				if(data.lineCount < AT_COMMAND_MAX_LINES){
+					data.data[data.lineCount][colCount] = '\0';
+					data.lineCount++;
+					colCount = 0;
+				}
 				state = 16;
 			}
 			else {
@@ -234,39 +239,3 @@ void printChar(uint8_t c)
 	}
 	putchar(c);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
