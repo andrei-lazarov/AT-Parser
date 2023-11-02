@@ -26,7 +26,6 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 			
 		case 1:
 			if(c == '\n') { // LF
-				data.lineCount++;
 				colCount = 0;
 				state = 2;
 			}
@@ -70,7 +69,6 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 			
 		case 5:
 			if(c == '\n') {
-				data.lineCount++;
 				colCount = 0;
 				state = 0;
 				return STATE_MACHINE_READY_OK;
@@ -130,7 +128,6 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 			
 		case 12:
 			if(c == '\n') {
-				data.lineCount++;
 				colCount = 0;
 				state = 0;
 				return STATE_MACHINE_READY_OK;
@@ -146,7 +143,7 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 		case 14:
 			if ((32 <= c) && (c <= 126)) {
 				if(data.lineCount < AT_COMMAND_MAX_LINES) {
-					if(colCount < AT_COMMAND_MAX_LINE_SIZE - 1) {
+					if(colCount < AT_COMMAND_MAX_LINE_SIZE) {
 						data.data[data.lineCount][colCount] = c;
 						colCount++;
 					}
@@ -161,7 +158,7 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 		case 15:
 			if ((32 <= c) && (c <= 126)) {
 				if(data.lineCount < AT_COMMAND_MAX_LINES){
-					if(colCount < AT_COMMAND_MAX_LINE_SIZE - 1) {
+					if(colCount < AT_COMMAND_MAX_LINE_SIZE) {
 						data.data[data.lineCount][colCount] = c;
 						colCount++;
 					}
@@ -225,17 +222,4 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 	}
 	colCount++;
 	return STATE_MACHINE_NOT_READY;
-}
-
-void printChar(uint8_t c)
-{
-	if (c=='\r') {
-		printf("<CR>");
-		return;
-	}
-	if (c=='\n') {
-		printf("<LF>\n");
-		return;
-	}
-	putchar(c);
 }
