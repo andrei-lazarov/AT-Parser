@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include "parser.h"
 
 int main( int argc, char *argv[] )  {
@@ -20,12 +21,22 @@ int main( int argc, char *argv[] )  {
 	printf("================ Parsing started ================\n");
 	int c = getc(f);
 	while(c != EOF) {
-		printChar(c);
 		STATE_MACHINE_RETURN_VALUE result = parse(c);
 		if(result == STATE_MACHINE_READY_OK) {
-			printf("\n======== Parsing finished with no errors ========\n");
-			printf(" > Press ENTER to parse the next command\n");
-			getchar();
+			printf("======== Parsing finished with no errors ========\n\n");
+			if(data.lineCount > 0) {
+				printf("============= Printing stored data ==============\n");
+				for(int i = 0; i < data.lineCount ; i++) {
+					for(int j=0; j <= AT_COMMAND_MAX_LINE_SIZE; j++){
+						putchar(data.data[i][j]);
+					}
+					printf("\n");
+				}
+				printf("============== Printing finished ================\n\n");
+			}
+			memset(&data, 0, sizeof(data));
+			data.lineCount = 0;
+
 		}
 		if(result == STATE_MACHINE_READY_WITH_ERROR){
 			printf("\n=========== Parsing stopped by error ============\n");
@@ -35,16 +46,6 @@ int main( int argc, char *argv[] )  {
 	}
 	fclose(f);
 	
-	printf("   No more commands to parse.\n");
-	printf(" > Press ENTER to print the stored data\n");
-	getchar();
-	printf("============= Printing stored data ==============\n");
-			for(int i = 0; i < data.lineCount ; i++) {
-				for(int j=0; j < AT_COMMAND_MAX_LINE_SIZE; j++){
-					putchar(data.data[i][j]);
-				}
-				printf("\n");
-			}
-	printf("============== Printing finished ================\n");
+
 	return 0;
 }
