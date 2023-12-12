@@ -9,9 +9,10 @@ AT_COMMAND_DATA data;
 //function definition
 STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 {
+	
 	static uint8_t state = 0;
 	static uint8_t colCount = 0;
-	
+	data.ok = 0;
 	switch(state)
 	{
 		case 0:
@@ -71,6 +72,7 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 			if(c == '\n') {
 				colCount = 0;
 				state = 0;
+				data.ok = 1;
 				return STATE_MACHINE_READY_OK;
 			}
 			else {
@@ -145,7 +147,7 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 				if(data.lineCount < AT_COMMAND_MAX_LINES) {
 					if(colCount < AT_COMMAND_MAX_LINE_SIZE) {
 						data.data[data.lineCount][colCount] = c;
-						colCount++;
+						colCount = colCount + 1;
 					}
 				}
 				state = 15;
@@ -160,7 +162,7 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 				if(data.lineCount < AT_COMMAND_MAX_LINES){
 					if(colCount < AT_COMMAND_MAX_LINE_SIZE) {
 						data.data[data.lineCount][colCount] = c;
-						colCount++;
+						colCount = colCount + 1;
 					}
 				}
 				state = 15;
@@ -220,6 +222,6 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 			}
 			break;
 	}
-	colCount++;
+	
 	return STATE_MACHINE_NOT_READY;
 }

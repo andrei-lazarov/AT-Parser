@@ -1,5 +1,8 @@
 //parser.h
 
+#include <stdio.h>
+#include <stdint.h>
+
 //header guard
 #ifndef __PARSER_AT__
 #define __PARSER_AT__
