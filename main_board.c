@@ -17,6 +17,11 @@
 
 const char at_command_simple[] = "AT\r\n";
 const char at_command_csq[] = "AT+CSQ\r\n";
+const char at_command_creg[] = "AT+CREG\r\n";
+const char at_command_cops[] = "AT+COPS\r\n";
+const char at_command_gsn[] = "AT+GSN\r\n";
+const char at_command_gmi[] = "AT+GMI\r\n";
+const char at_command_gmr[] = "AT+GMR\r\n";
 STATE_MACHINE_RETURN_VALUE StateMachineReturn;
 timer_software_handler_t my_timer_handler; 
 timer_software_handler_t my_handler;
