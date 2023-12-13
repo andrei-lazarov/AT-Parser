@@ -18,6 +18,8 @@ int main( int argc, char *argv[] )  {
 		return -1;
 	}
 
+	atypical = 1;
+
 	printf("================ Parsing started ================\n");
 	int c = getc(f);
 	while(c != EOF) {

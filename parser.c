@@ -5,6 +5,7 @@
 #include "parser.h"
 
 AT_COMMAND_DATA data;
+uint8_t atypical;
 
 //function definition
 STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
@@ -28,7 +29,12 @@ STATE_MACHINE_RETURN_VALUE parse(uint8_t c)
 		case 1:
 			if(c == '\n') { // LF
 				colCount = 0;
-				state = 2;
+				if (atypical) {
+					state = 14;
+				}
+				else {
+					state = 2;
+				}
 			}
 			else {
 				return STATE_MACHINE_READY_WITH_ERROR;

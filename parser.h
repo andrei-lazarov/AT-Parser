@@ -26,6 +26,7 @@ typedef enum
 
 //shared variables
 extern AT_COMMAND_DATA data;
+extern uint8_t atypical;
 
 //function decl
 STATE_MACHINE_RETURN_VALUE parse(uint8_t c); 
